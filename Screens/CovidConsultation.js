@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {View, Button, Text, StyleSheet, Alert, ActivityIndicator} from 'react-native'
+import {View, Button, Text, StyleSheet, Alert, ActivityIndicator, Linking, TouchableOpacity} from 'react-native'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
@@ -18,7 +18,7 @@ const CovidConsultation = () => {
         {state: null, name:"Diarrhoea", id: 8},
         {state: null, name:"Skin Rash or Discoloration of fingers and toes", id: 9},
         {state: null, name:"Eye Redness or Irritation", id: 10},
-        {state: null, name:"Difficulty Breather or Shortness of Breath", id: 11},
+        {state: null, name:"Difficulty Breathing or Shortness of Breath", id: 11},
         {state: null, name:"Loss of Speech or Mobility, or Confusion", id: 12},
         {state: null, name:"Chest Pains", id: 13},
     ])
@@ -50,7 +50,6 @@ const CovidConsultation = () => {
         const formBody = new FormData()
         const symptoms = SymptomBool.map((item)=>{return item.name})
         const symptomsVal = SymptomBool.map((item)=>{return item.state})
-        console.log({symptoms}, {symptomsVal})
         formBody.append('symptoms', JSON.stringify(await symptoms))
         formBody.append('symptomsVal', JSON.stringify(await symptomsVal))
         try {
@@ -64,7 +63,19 @@ const CovidConsultation = () => {
                 if (err || resJson.status === 'error'){
                     Alert.alert('Error', err.message || resJson.status.log,)
                 } else {
-                    Alert.alert(resJson.diagnosis.title, resJson.diagnosis.message,)
+                    Alert.alert(resJson.diagnosis.title, resJson.diagnosis.message,
+                        [
+                            {
+                                text: 'Covid Precautions',
+                                onPress: ()=>{Linking.openURL('https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public').catch((err)=>Alert.alert('Error', 'Cannot open link'))},
+                                style: 'default'
+                            },
+                            {
+                                text: 'Close popup',
+                                style: 'cancel'
+                            }
+                        ]
+                        )
                 }
                 setFetching(false)
             })
@@ -126,9 +137,15 @@ const CovidConsultation = () => {
             <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 30}}>
                 {SymptomBool.map((item)=>{
                 return <View key={item.id} style={{transform: Step==item.id?[{scale: 1.3}]:[]}}>
-                    <FontAwesomeIcon icon={ faCheckCircle } color={item.state==true? 'green': item.state==false ? 'red': 'black'} />
+                    <FontAwesomeIcon icon={ faCheckCircle } color={item.state==true? 'red': item.state==false ? 'green': 'black'} />
                 </View>
             })}
+            </View>
+            <View>
+                <TouchableOpacity style={styles.footer}>
+                    <Text style={styles.footerText}>Symptoms listed above are from the</Text>
+                    <Text style={[styles.footerText, {color: 'blue'}]} onPress={()=>{Linking.openURL("https://www.who.int/health-topics/coronavirus#tab=tab_3").catch((err)=>Alert.alert('Error', 'Cannot open link'))}}>World Health Organization</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )
@@ -147,6 +164,9 @@ const CovidConsultation = () => {
             alignItems: 'center',
             justifyContent: 'center'
         },
+        footerText:{
+            fontSize: 15
+        }
     })
 
 
