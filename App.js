@@ -16,13 +16,15 @@ import {
 // package imports
 
 import CovidConsultation from './Screens/CovidConsultation';
+import Tips from './Screens/Tips';
 // local imports
 
 const App = () => {
   return (
     <View>
       <StatusBar hidden={true} />
-      <CovidConsultation />
+      {/* <CovidConsultation /> */}
+      <Tips/>
     </View>
   );
 };
